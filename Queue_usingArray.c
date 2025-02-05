@@ -1,123 +1,142 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Stack {
+typedef struct Queue {
+    int *arr;
+    int front;
+    int rear;
     int size;
-    int topElement;
-    int* arr;
-} Stack;
+} Queue;
 
-void push(Stack* stack, int value) {
-    stack->arr[++stack->topElement] = value;
+void initQueue(Queue *q) {
+    q->size = 1000;
+    q->front = -1;
+    q->rear = -1;
+    q->arr = (int*)malloc(q->size * sizeof(int));
 }
 
-int isEmpty(Stack* stack) {
-    return stack->topElement == -1;
+int isFull(Queue *q) {
+    return (q->rear == q->size - 1);
 }
 
-int isFull(Stack* stack) {
-    return stack->topElement == stack->size - 1;
+int isEmpty(Queue *q) {
+    return (q->front == -1 || q->front > q->rear);
 }
 
-int pop(Stack* stack) {
-    if (isEmpty(stack)) {
-        printf("Stack is empty\n");
-        return -1;
+void enqueue(Queue *q, int value) {
+    if (isFull(q)) {
+        printf("Queue is full! Cannot enqueue %d\n", value);
     } else {
-        return stack->arr[stack->topElement--];
+        if (q->front == -1) {
+            q->front = 0;
+        }
+        q->rear++;
+        q->arr[q->rear] = value;
+        printf("Enqueued %d\n", value);
     }
 }
 
-void enqueue(Stack* stack, int value) {
-    if (isFull(stack)) {
-        printf("Stack overflow! Cannot enqueue.\n");
+void dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty! Cannot dequeue.\n");
     } else {
-        stack->arr[++stack->topElement] = value;
+        printf("Dequeued %d\n", q->arr[q->front]);
+        q->front++;
     }
 }
 
-int dequeue(Stack* stack) {
-    if (isEmpty(stack)) {
-        printf("Queue is empty\n");
-        return -1;
+void peek(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty! Cannot peek.\n");
     } else {
-        return stack->arr[stack->topElement--];
+        printf("Front element is %d\n", q->arr[q->front]);
     }
 }
 
-int peek(Stack* stack) {
-    if (isEmpty(stack)) {
-        printf("Queue is empty\n");
-        return -1;
+void size(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty! Size is 0.\n");
     } else {
-        return stack->arr[stack->topElement];
+        printf("Queue size is %d\n", q->rear - q->front + 1);
     }
 }
 
-int size(Stack* stack) {
-    return stack->topElement + 1;
+void display(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty!\n");
+    } else {
+        printf("Queue elements: ");
+        for (int i = q->front; i <= q->rear; i++) {
+            printf("%d ", q->arr[i]);
+        }
+        printf("\n");
+    }
 }
 
 int main() {
-    Stack stack;
-    stack.size = 100;
-    stack.topElement = -1;
-    stack.arr = (int*)malloc(stack.size * sizeof(int));
 
-    int choice, value;
+    Queue *q = (Queue*)malloc(sizeof(Queue));
+    initQueue(q);
 
-    printf("Queue Operations Menu\n");
-    printf("Enqueue into the queue\n");
-    printf("Dequeue from the queue\n");
-    printf("Peek into the Queue\n");
-    printf("Check if Queue is Empty\n");
-    printf("Get the size of Queue\n");
-    printf("Exit\n");
+    int ch, val;
+    printf("Queue Operations Menu:\n");
+    printf("\t1. Enqueue (Add to queue)\n");
+    printf("\t2. Dequeue (Remove from queue)\n");
+    printf("\t3. Peek (View front element)\n");
+    printf("\t4. Check if the queue is empty\n");
+    printf("\t5. Get the size of the queue\n");
+    printf("\t6. Display queue\n");
+    printf("\t7. Exit\n");
     while (1) {
-        printf("Enter your Choice(1-6): ");
-        scanf("%d", &choice);
 
-        switch (choice) {
+        printf("Enter your choice (1-7): ");
+        scanf("%d", &ch);
+
+        switch (ch) {
             case 1:
-                printf("Enter value to Enqueue: ");
-                scanf("%d", &value);
-                enqueue(&stack, value);
+                printf("Enter value to enqueue: ");
+                if (scanf("%d", &val) != 1) {
+                    printf("Invalid input! Please enter an integer.\n");
+                    while (getchar() != '\n');
+                    break;
+                }
+                enqueue(q, val);
                 break;
 
             case 2:
-                value = dequeue(&stack);
-                if (value != -1) {
-                    printf("Dequeued value: %d\n", value);
-                }
+                dequeue(q);
                 break;
 
             case 3:
-                value = peek(&stack);
-                if (value != -1) {
-                    printf("Front element: %d\n", value);
-                }
+                peek(q);
                 break;
 
             case 4:
-                if (isEmpty(&stack)) {
-                    printf("The Queue is empty.\n");
+                if (isEmpty(q)) {
+                    printf("Queue is empty.\n");
                 } else {
-                    printf("The Queue is not empty.\n");
+                    printf("Queue is not empty.\n");
                 }
                 break;
 
             case 5:
-                printf("Size of the Queue is: %d\n", size(&stack));
+                size(q);
                 break;
 
             case 6:
+                display(q);
+                break;
+
+            case 7:
                 printf("Exiting...\n");
-                free(stack.arr);
+                free(q->arr);
+                free(q);
                 return 0;
 
             default:
-                printf("Invalid Choice. Please enter a valid input.\n");
+                printf("Invalid choice! Please select a valid option.\n");
         }
     }
+
     return 0;
 }
