@@ -1,21 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define tableSize 10
+#define TABLE_SIZE 10
 
 typedef struct Node {
     int key;
     int value;
     struct Node *next;
-} Node;
+} node;
 
 typedef struct HashMap {
-    Node* table[tableSize];
+    node* table[TABLE_SIZE];
 } HashMap;
 
-// Function to create a new node
-Node* createNode(int key, int val) {
-    Node* ptr = (Node*)malloc(sizeof(Node));
+node* createNode(int key, int val) {
+    node *ptr = (node*)malloc(sizeof(node));
     ptr->key = key;
     ptr->value = val;
     ptr->next = NULL;
@@ -23,31 +22,31 @@ Node* createNode(int key, int val) {
 }
 
 int hash(int key) {
-    return key % tableSize;
+    return key % TABLE_SIZE;
 }
 
-void hashInit(HashMap* map) {
-    for (int i = 0; i < tableSize; i++) {
+void initHashTable(HashMap* map) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
         map->table[i] = NULL;
     }
 }
 
 void insert(HashMap* map, int key, int value) {
     int index = hash(key);
-    Node* ptr = createNode(key, value);
+    node *ptr = createNode(key, value);
 
     if (map->table[index] == NULL) {
         map->table[index] = ptr;
     } 
     else {
-        Node* curr = map->table[index];
-        while(curr != NULL) {
-            if(curr->key == key) {
-                curr->value = value;
+        node *temp = map->table[index];
+        while(temp != NULL) {
+            if(temp->key == key) {
+                temp->value = value;
                 free(ptr);
                 return;
             }
-            curr = curr->next;
+            temp = temp->next;
         }
         ptr->next = map->table[index];
         map->table[index] = ptr;
@@ -57,21 +56,21 @@ void insert(HashMap* map, int key, int value) {
 
 void search(HashMap* map, int key) {
     int index = hash(key);
-    Node* curr = map->table[index];
-    while (curr != NULL) {
-        if (curr->key == key) {
-            printf("Value: %d\n", curr->value);
+    node *temp = map->table[index];
+    while (temp != NULL) {
+        if (temp->key == key) {
+            printf("Value: %d\n", temp->value);
             return;
         }
-        curr = curr->next;
+        temp = temp->next;
     }
     printf("Key %d not found.\n", key);
 }
 
 void delete(HashMap* map, int key) {
     int index = hash(key);
-    Node* curr = map->table[index];
-    Node* prev = NULL;
+    node* curr = map->table[index];
+    node* prev = NULL;
 
     while (curr != NULL) {
         if (curr->key == key) {
@@ -90,33 +89,33 @@ void delete(HashMap* map, int key) {
     printf("Key %d not found.\n", key);
 }
 
-void display(HashMap* map) {
+void DisplayList(HashMap* map) {
     printf("Hash Table:\n");
-    for (int i = 0; i < tableSize; i++) {
-        Node* curr = map->table[i];
-        if (curr != NULL) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        node* ptr = map->table[i];
+        if (ptr != NULL) {
             printf("Index %d: ", i);
-            while (curr != NULL) {
-                printf("(%d, %d) -> ", curr->key, curr->value);
-                curr = curr->next;
+            while (ptr != NULL) {
+                printf("(%d, %d ) \n ", ptr->key, ptr->value);
+                ptr = ptr->next;
             }
-            printf("NULL\n");
+            
         }
     }
 }
 
 int main() {
     HashMap map;
-    hashInit(&map);
+    initHashTable(&map);
     int ch, key, value;
 
-    printf("Hashmap operation\n");
+    printf("Operations\n");
     while (1) {
-        printf("\t1. Insert (Put)\n");
-        printf("\t2. Search (Get)\n");
-        printf("\t3. Delete (Remove)\n");
-        printf("\t4. Display\n");
-        printf("\t5. Exit\n");
+        printf("1. Insert \n");
+        printf("2. Search \n");
+        printf("3. Delete \n");
+        printf("4. Display \n");
+        printf("5. Exit\n");
         printf("\nEnter your choice: ");
         scanf("%d", &ch);
 
@@ -134,18 +133,18 @@ int main() {
                 search(&map, key);
                 break;
             case 3:
-                printf("Enter key for delete: ");
+                printf("Enter key to delete: ");
                 scanf("%d", &key);
                 delete(&map, key);
                 break;
             case 4:
-                display(&map);
+                DisplayList(&map);
                 break;
             case 5:
-                printf("Exiting program.\n");
+                printf("Program Ended.\n");
                 return 0;
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("Enter Valid Choice.\n");
         }
     }
 
